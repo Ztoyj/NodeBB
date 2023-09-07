@@ -1,4 +1,3 @@
-/* eslint-disable import/no-import-module-exports */
 import validator from 'validator';
 
 import db from '../database';
@@ -81,7 +80,7 @@ async function modifyMessage(message: MessageType, fields: string[], mid: number
     return payload.message;
 }
 
-module.exports = function (Messaging: MessagingType) {
+export = function (Messaging: MessagingType) {
     Messaging.newMessageCutoff = 1000 * 60 * 3;
 
     Messaging.getMessagesFields = async (mids, fields) => {
