@@ -32,11 +32,15 @@ interface MessageType {
     edited: boolean;
 }
 
+interface PlugDataType{
+    messages: MessageType;
+}
+
 interface MessagingType {
     newMessageCutoff: number;
     getMessagesFields: (mids: string[], fields: string[]) => Promise<MessageType[]>;
-    getMessageField: (mid: string, field: string) => Promise<MessageType>;
-    getMessageFields: (mid: string, fields: string[]) => Promise<MessageType|null>;
+    getMessageField: (mid: string, field: keyof MessageType) => Promise<string | number | boolean | DataType| null>;
+    getMessageFields: (mid: string, fields: string[]) => Promise<MessageType | null>;
     setMessageField: (mid: string, field: string, content: string) => Promise<void>;
     setMessageFields: (mid: string, data: string) => Promise<void>;
     getMessagesData: (mids: string[], uid: string, roomId: number, isNew: boolean) => Promise<MessageType>;
@@ -139,8 +143,6 @@ module.exports = function (Messaging: MessagingType) {
         ) as DataType[];
 
         messages.forEach((message, index) => {
-            // The next line calls a function in a module that has not been updated to TS yet
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             message.fromUser = users[index];
             message.fromUser.banned = !!message.fromUser.banned;
             message.fromUser.deleted = message.fromuid !== message.fromUser.uid && message.fromUser.uid === 0;
@@ -214,14 +216,14 @@ module.exports = function (Messaging: MessagingType) {
 
         // The next line calls a function in a module that has not been updated to TS yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const data = await plugins.hooks.fire('filter:messaging.getMessages', {
+        const data: PlugDataType = await plugins.hooks.fire('filter:messaging.getMessages', {
             messages: messages,
             uid: uid,
             roomId: roomId,
             isNew: isNew,
             mids: mids,
-        });
+        }) as PlugDataType;
 
-        return (data && data.messages) as MessageType;
+        return data && data.messages;
     };
 };

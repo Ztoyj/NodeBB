@@ -96,8 +96,6 @@ module.exports = function (Messaging) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const users = yield user_1.default.getUsersFields(messages.map(msg => msg && msg.fromuid), ['uid', 'username', 'userslug', 'picture', 'status', 'banned']);
         messages.forEach((message, index) => {
-            // The next line calls a function in a module that has not been updated to TS yet
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             message.fromUser = users[index];
             message.fromUser.banned = !!message.fromUser.banned;
             message.fromUser.deleted = message.fromuid !== message.fromUser.uid && message.fromUser.uid === 0;
@@ -176,6 +174,6 @@ module.exports = function (Messaging) {
             isNew: isNew,
             mids: mids,
         });
-        return (data && data.messages);
+        return data && data.messages;
     });
 };
